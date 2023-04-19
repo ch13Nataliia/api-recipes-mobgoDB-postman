@@ -1,9 +1,10 @@
 const express = require('express');
-const setupMiddleware = require('./middleware');
+
 
 
 const app = express();
-setupMiddleware(app);
+require('./middleware')(app);
 require('./db')
+require('./routes')(app);
 
 module.exports = app;

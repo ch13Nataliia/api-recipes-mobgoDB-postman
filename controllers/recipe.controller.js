@@ -1,36 +1,46 @@
-const Recipe = require("../models/recipe/recipe.model");
+const Recipe = require('../models/recipe.model');
 
-exports.getRecipes = function (req, res) {
+exports.getRecipes = async (req, res) => {
   let query = {};
   if (req.params.id) {
     query._id = req.params.id;
   }
-  Recipe.find(query).exec((err, recipes) => {
-    if (err) return errorHandler(res, err);
-    return res.status(200).json(recipes);
-  });
+  try {
+    const recipes = await Recipe.find(query);
+    res.status(200).json(recipes);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 };
 
-exports.addRecipe = function (req, res) {
+exports.addRecipe = async (req, res) => {
   const recipeData = req.body;
-  console.log("recipeData", recipeData);
-  const newRecipe = new Recipe(recipeData);
-  newRecipe.save((err, recipe) => {
-    if (err) return errorHandler(res, err);
-    return res.status(201).json(recipe);
-  });
+  console.log('recipeData', recipeData);
+  try {
+    const newRecipe = new Recipe(recipeData);
+    const result = await newRecipe.save();
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 };
 
-exports.updateRecipe = function (req, res) {
-  Recipe.updateOne({ _id: req.params.id }, req.body, function (err) {
-    if (err) return errorHandler(res, err);
+exports.updateRecipe = async (req, res) => {
+  try {
+    const result = await Recipe.updateOne({ _id: req.params.id }, req.body);
+    if (result.n === 0) return res.sendStatus(404);
     res.sendStatus(200);
-  });
+  } catch (err) {
+    res.status(500).send(err);
+  }
 };
 
-exports.removeRecipe = function (req, res) {
-  Recipe.deleteOne({ _id: req.params.id }, function (err) {
-    if (err) return errorHandler(res, err);
-    res.sendStatus(204);
-  });
+exports.removeRecipe = async (req, res) => {
+  try {
+    const result = await Recipe.deleteOne({ _id: req.params.id });
+    if (result.n === 0) return res.sendStatus(404);
+    res.sendStatus(204).json(result);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 };
