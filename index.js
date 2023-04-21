@@ -1,7 +1,7 @@
 const server = require('./server');
 
 const {
-PORT = 3332,
+PORT = 3333,
 NODE_ENV='development'
 } = process.env;
 
